@@ -21,7 +21,7 @@ struct DataView: View {
                 TileStatsCard(
                     totalTiles:
                         explorationManager
-                            .discoveredCells
+                            .discoveredTiles
                             .count,
 
                     todayTiles:

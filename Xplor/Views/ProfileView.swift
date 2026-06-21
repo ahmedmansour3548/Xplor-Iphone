@@ -10,16 +10,23 @@ import SwiftUI
 
 struct ProfileView: View {
 
+    @EnvironmentObject var settingsManager:
+        SettingsManager
+
     var body: some View {
 
         NavigationStack {
 
-            VStack {
+            Form {
 
-                Text("Profile Screen")
-                    .font(.largeTitle)
+                Section("Developer") {
 
-                Text("Settings and account information")
+                    Toggle(
+                        "Debug Mode",
+                        isOn: $settingsManager.debugMode
+                    )
+
+                }
 
             }
             .navigationTitle("Profile")

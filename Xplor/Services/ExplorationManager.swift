@@ -11,10 +11,19 @@ internal import Combine
 
 class ExplorationManager: ObservableObject {
 
-    @Published var discoveredCells: Set<GridCell> = []
+    @Published var discoveredTiles: Set<GridTile> = []
     @Published var tilesDiscoveredToday = 0
     
-    private let saveKey = "DiscoveredCells"
+    @Published var completedZones: Set<Zone> = []
+    @Published var completedRegions: Set<Region> = []
+    
+    var totalTilesDiscovered: Int {
+
+        discoveredTiles.count
+
+    }
+    
+    private let saveKey = "DiscoveredTiles"
     private let todayCountKey = "TilesDiscoveredToday"
 
     private let todayDateKey = "TilesDiscoveredDate"
@@ -33,31 +42,37 @@ class ExplorationManager: ObservableObject {
 
     func updateLocation(_ location: CLLocation) {
 
-        let currentCell = gridCell(for: location)
+        let currentTile = gridTile(for: location)
 
-        var discoveredNewCell = false
+        var newTilesDiscovered = 0
 
         for xOffset in -1...1 {
             for yOffset in -1...1 {
 
-                let nearbyCell = GridCell(
-                    x: currentCell.x + xOffset,
-                    y: currentCell.y + yOffset
+                let nearbyTile = GridTile(
+                    x: currentTile.x + xOffset,
+                    y: currentTile.y + yOffset
                 )
 
-                if !discoveredCells.contains(nearbyCell) {
+                if !discoveredTiles.contains(nearbyTile) {
 
-                    discoveredCells.insert(nearbyCell)
-                    discoveredNewCell = true
+                    discoveredTiles.insert(nearbyTile)
+
+                    newTilesDiscovered += 1
 
                 }
             }
         }
 
-        if discoveredNewCell {
+        if newTilesDiscovered > 0 {
+
             save()
-            
-            tilesDiscoveredToday += 1
+
+            updateCompletions(
+                around: currentTile
+            )
+
+            tilesDiscoveredToday += newTilesDiscovered
 
             UserDefaults.standard.set(
                 tilesDiscoveredToday,
@@ -66,20 +81,103 @@ class ExplorationManager: ObservableObject {
         }
     }
 
-    func gridCell(for location: CLLocation) -> GridCell {
+    func gridTile(for location: CLLocation) -> GridTile {
 
-        let cellSize = 0.001
+        let tileSize = 0.001
 
-        let x = Int(location.coordinate.latitude / cellSize)
-        let y = Int(location.coordinate.longitude / cellSize)
+        let x = Int(location.coordinate.latitude / tileSize)
+        let y = Int(location.coordinate.longitude / tileSize)
 
-        return GridCell(x: x, y: y)
+        return GridTile(x: x, y: y)
     }
+    
 
+    func zoneForTile(for tile: GridTile) -> Zone {
+
+        Zone(
+            x: tile.x / Zone.sizeInTiles,
+            y: tile.y / Zone.sizeInTiles
+        )
+    }
+    
+    func regionForZone(for zone: Zone) -> Region {
+
+        Region(
+            x: zone.x / Region.sizeInZones,
+            y: zone.y / Region.sizeInZones
+        )
+    }
+    
+    func discoveredTileCount(
+        in targetZone: Zone
+    ) -> Int {
+
+        discoveredTiles.filter {
+
+            self.zoneForTile(for: $0) == targetZone
+
+        }.count
+    }
+    
+    func completedZoneCount(
+        in region: Region
+    ) -> Int {
+
+        completedZones.filter {
+
+            self.regionForZone(for: $0) == region
+
+        }.count
+    }
+    
+    func updateCompletions(
+        around tile: GridTile
+    ) {
+
+        let currentZone = zoneForTile(for: tile)
+
+        let tileCount =
+            discoveredTileCount(
+                in: currentZone
+            )
+
+        if tileCount == 256 {
+
+            completedZones.insert(
+                currentZone
+            )
+
+            print(
+                "ZONE COMPLETED:",
+                currentZone
+            )
+        }
+
+        let currentRegion =
+            regionForZone(for: currentZone)
+
+        let zoneCount =
+            completedZoneCount(
+                in: currentRegion
+            )
+
+        if zoneCount == 64 {
+
+            completedRegions.insert(
+                currentRegion
+            )
+
+            print(
+                "REGION COMPLETED:",
+                currentRegion
+            )
+        }
+    }
+    
     private func save() {
 
         if let data = try? JSONEncoder().encode(
-            Array(discoveredCells)
+            Array(discoveredTiles)
         ) {
 
             UserDefaults.standard.set(
@@ -99,13 +197,13 @@ class ExplorationManager: ObservableObject {
             return
         }
 
-        if let cells =
+        if let tiles =
             try? JSONDecoder().decode(
-                [GridCell].self,
+                [GridTile].self,
                 from: data
             ) {
 
-            discoveredCells = Set(cells)
+            discoveredTiles = Set(tiles)
         }
     }
     
@@ -141,10 +239,19 @@ class ExplorationManager: ObservableObject {
     
     func reset() {
 
-        discoveredCells.removeAll()
+        discoveredTiles.removeAll()
 
         UserDefaults.standard.removeObject(
             forKey: saveKey
+        )
+        
+        completedZones.removeAll()
+        completedRegions.removeAll()
+
+        tilesDiscoveredToday = 0
+
+        UserDefaults.standard.removeObject(
+            forKey: todayCountKey
         )
 
     }

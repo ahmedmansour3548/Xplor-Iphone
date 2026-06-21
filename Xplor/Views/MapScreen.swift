@@ -14,6 +14,9 @@ struct MapScreen: View {
     @StateObject private var locationManager = LocationManager()
     @EnvironmentObject var explorationManager:
         ExplorationManager
+    @EnvironmentObject var settingsManager:
+        SettingsManager
+    
     @State private var cameraUpdateID = 0
 
     @State private var cameraPosition: MapCameraPosition =
@@ -26,8 +29,8 @@ struct MapScreen: View {
 
     var body: some View {
         MapReader { proxy in
-        ZStack(alignment: .bottom) {
-            
+            ZStack(alignment: .bottom) {
+                
                 Map(position: $cameraPosition) {
                     
                     // Player marker
@@ -54,10 +57,10 @@ struct MapScreen: View {
                 .onMapCameraChange(
                     frequency: .continuous
                 ) { context in
-
+                    
                     cameraUpdateID += 1
                     visibleRegion = context.region
-
+                    
                 }
                 .mapStyle(
                     .hybrid(
@@ -67,72 +70,76 @@ struct MapScreen: View {
                 .colorMultiply(.gray)
                 .saturation(0.15)
                 .ignoresSafeArea()
-            FogOverlay(
-                discoveredCells: explorationManager.discoveredCells,
-                mapProxy: proxy,
-                cameraUpdateID: cameraUpdateID,
-                visibleRegion: visibleRegion
-            )
-            
-                VStack(spacing: 4) {
+                FogOverlay(
+                    discoveredTiles: explorationManager.discoveredTiles,
+                    mapProxy: proxy,
+                    cameraUpdateID: cameraUpdateID,
+                    visibleRegion: visibleRegion
+                )
+                
+                if settingsManager.debugMode {
                     
-                    if let location = locationManager.location {
+                    VStack(spacing: 4) {
                         
-                        Text(
-                            String(
-                                format: "Lat: %.6f",
-                                location.coordinate.latitude
-                            )
-                        )
-                        
-                        Text(
-                            String(
-                                format: "Lon: %.6f",
-                                location.coordinate.longitude
-                            )
-                        )
-                        
-                        Text(
-                            String(
-                                format: "Heading: %.0f°",
-                                locationManager.heading
-                            )
-                        )
-                        
-                        Text(
-                            "Discovered Cells: \(explorationManager.discoveredCells.count)"
-                        )
-                        
-                        Button("Move East 1 Cell") {
+                        if let location = locationManager.location {
                             
-                            guard let current = locationManager.location else {
-                                return
+                            Text(
+                                String(
+                                    format: "Lat: %.6f",
+                                    location.coordinate.latitude
+                                )
+                            )
+                            
+                            Text(
+                                String(
+                                    format: "Lon: %.6f",
+                                    location.coordinate.longitude
+                                )
+                            )
+                            
+                            Text(
+                                String(
+                                    format: "Heading: %.0f°",
+                                    locationManager.heading
+                                )
+                            )
+                            
+                            Text(
+                                "Discovered Tiles: \(explorationManager.discoveredTiles.count)"
+                            )
+                            
+                            Button("Move East 1 Tile") {
+                                
+                                guard let current = locationManager.location else {
+                                    return
+                                }
+                                
+                                locationManager.setDebugLocation(
+                                    latitude: current.coordinate.latitude,
+                                    longitude: current.coordinate.longitude + 0.001
+                                )
                             }
                             
-                            locationManager.setDebugLocation(
-                                latitude: current.coordinate.latitude,
-                                longitude: current.coordinate.longitude + 0.001
-                            )
-                        }
-                        
-                        Button("Reset Exploration") {
+                            Button("Reset Exploration") {
+                                
+                                explorationManager.reset()
+                                
+                            }
                             
-                            explorationManager.reset()
+                        } else {
+                            
+                            Text("Waiting for location...")
                             
                         }
-                        
-                    } else {
-                        
-                        Text("Waiting for location...")
                         
                     }
-                    
-                }
                 .padding()
                 .background(.ultraThinMaterial)
                 .cornerRadius(12)
-                .padding()
-                
+                .padding(.horizontal)
+                .padding(.bottom, 90)
+                    
+                }
             }
             .onAppear {
                 locationManager.requestLocationPermission()

@@ -15,12 +15,16 @@ struct ContentView: View {
     @StateObject private var explorationManager =
             ExplorationManager()
     
+    @StateObject private var settingsManager =
+        SettingsManager()
+    
     var body: some View {
 
         TabView(selection: $selectedTab) {
 
             DataView()
                 .environmentObject(explorationManager)
+                .environmentObject(settingsManager)
                 .tabItem {
                     Label("Data", systemImage: "chart.bar.fill")
                 }
@@ -28,12 +32,14 @@ struct ContentView: View {
 
             MapScreen()
                 .environmentObject(explorationManager)
+                .environmentObject(settingsManager)
                 .tabItem {
                     Label("Explore", systemImage: "map.fill")
                 }
                 .tag(1)
 
             ProfileView()
+                .environmentObject(settingsManager)
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }

@@ -8,7 +8,7 @@ import SwiftUI
 
 struct FogOverlay: View {
 
-    let discoveredCells: Set<GridCell>
+    let discoveredTiles: Set<GridTile>
     let mapProxy: MapProxy
     let cameraUpdateID: Int
     let visibleRegion: MKCoordinateRegion?
@@ -63,7 +63,7 @@ struct FogOverlay: View {
             // Grid lines
             //----------------------------------
 
-            let cellSize = GridCell.cellSize
+            let tileSize = GridTile.tileSize
 
             let gridOpacity =
                 max(
@@ -81,8 +81,8 @@ struct FogOverlay: View {
                 //----------------------------------
 
                 var lon =
-                    floor(minLon / cellSize)
-                    * cellSize
+                    floor(minLon / tileSize)
+                    * tileSize
 
                 while lon <= maxLon {
 
@@ -124,7 +124,7 @@ struct FogOverlay: View {
                         )
                     }
 
-                    lon += cellSize
+                    lon += tileSize
                 }
 
                 //----------------------------------
@@ -132,8 +132,8 @@ struct FogOverlay: View {
                 //----------------------------------
 
                 var lat =
-                    floor(minLat / cellSize)
-                    * cellSize
+                    floor(minLat / tileSize)
+                    * tileSize
 
                 while lat <= maxLat {
 
@@ -175,7 +175,7 @@ struct FogOverlay: View {
                         )
                     }
 
-                    lat += cellSize
+                    lat += tileSize
                 }
             }
 
@@ -185,16 +185,16 @@ struct FogOverlay: View {
 
             context.blendMode = .destinationOut
 
-            for cell in discoveredCells {
+            for tile in discoveredTiles {
 
-                if cell.maxLatitude < minLat || cell.minLatitude > maxLat
-                    || cell.maxLongitude < minLon || cell.minLongitude > maxLon
+                if tile.maxLatitude < minLat || tile.minLatitude > maxLat
+                    || tile.maxLongitude < minLon || tile.minLongitude > maxLon
                 {
 
                     continue
                 }
 
-                let corners = cell.coordinates
+                let corners = tile.coordinates
 
                 guard
                     let p0 = mapProxy.convert(

@@ -10,7 +10,7 @@ import MapKit
 
 struct RevealedMapLayer: View {
 
-    let discoveredCells: Set<GridCell>
+    let discoveredTiles: Set<GridTile>
     @Binding var cameraPosition: MapCameraPosition
 
     var body: some View {
@@ -18,12 +18,12 @@ struct RevealedMapLayer: View {
         Map(position: $cameraPosition) {
 
             ForEach(
-                Array(discoveredCells),
+                Array(discoveredTiles),
                 id: \.self
-            ) { cell in
+            ) { tile in
 
                 MapPolygon(
-                    coordinates: cell.coordinates
+                    coordinates: tile.coordinates
                 )
                 .foregroundStyle(.white)
 
