@@ -73,4 +73,14 @@ class ExplorationManager: ObservableObject {
             discoveredCells = Set(cells)
         }
     }
+    
+    func reset() {
+
+        discoveredCells.removeAll()
+
+        UserDefaults.standard.removeObject(
+            forKey: saveKey
+        )
+
+    }
 }

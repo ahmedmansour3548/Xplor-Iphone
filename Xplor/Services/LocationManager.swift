@@ -13,6 +13,8 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     @Published var location: CLLocation?
     @Published var heading: Double = 0
+    
+    @Published var debugMode = true
 
     override init() {
         super.init()
@@ -41,5 +43,17 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         didUpdateHeading newHeading: CLHeading
     ) {
         heading = newHeading.trueHeading
+    }
+    
+    func setDebugLocation(
+        latitude: Double,
+        longitude: Double
+    ) {
+
+        location = CLLocation(
+            latitude: latitude,
+            longitude: longitude
+        )
+
     }
 }
