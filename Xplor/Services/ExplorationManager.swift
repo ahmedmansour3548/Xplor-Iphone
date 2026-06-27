@@ -17,6 +17,8 @@ class ExplorationManager: ObservableObject {
     @Published var completedZones: Set<Zone> = []
     @Published var completedRegions: Set<Region> = []
     
+    private var cancellables = Set<AnyCancellable>()
+    
     var totalTilesDiscovered: Int {
 
         discoveredTiles.count
@@ -28,7 +30,7 @@ class ExplorationManager: ObservableObject {
 
     private let todayDateKey = "TilesDiscoveredDate"
 
-    init() {
+    init(locationManager: LocationManager) {
 
         load()
 
@@ -38,6 +40,25 @@ class ExplorationManager: ObservableObject {
             UserDefaults.standard.integer(
                 forKey: todayCountKey
             )
+
+        locationManager.locationSubject
+            .removeDuplicates {
+                lhs,
+                rhs in
+
+                lhs.coordinate.latitude ==
+                rhs.coordinate.latitude
+                &&
+                lhs.coordinate.longitude ==
+                rhs.coordinate.longitude
+            }
+            .sink { [weak self] location in
+
+                self?.updateLocation(location)
+
+            }
+            .store(in: &cancellables)
+
     }
 
     func updateLocation(_ location: CLLocation) {

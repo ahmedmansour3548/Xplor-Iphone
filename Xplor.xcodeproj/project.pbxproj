@@ -10,9 +10,22 @@
 		E204400E2FE67C7F00AC1811 /* Xplor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Xplor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E2A487322FEE783B003AF776 /* Exceptions for "Xplor" folder in "Xplor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E204400D2FE67C7F00AC1811 /* Xplor */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E20440102FE67C7F00AC1811 /* Xplor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E2A487322FEE783B003AF776 /* Exceptions for "Xplor" folder in "Xplor" target */,
+			);
 			path = Xplor;
 			sourceTree = "<group>";
 		};
@@ -254,7 +267,9 @@
 				DEVELOPMENT_TEAM = 7N5498B3R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Xplor uses your location to track places you have explored.";
+				INFOPLIST_FILE = Xplor/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Xplor needs your location to uncover discovered tiles.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Xplor needs your location to uncover discovered tiles.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -287,7 +302,9 @@
 				DEVELOPMENT_TEAM = 7N5498B3R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Xplor uses your location to track places you have explored.";
+				INFOPLIST_FILE = Xplor/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Xplor needs your location to uncover discovered tiles.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Xplor needs your location to uncover discovered tiles.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
